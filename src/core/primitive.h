@@ -61,6 +61,7 @@ class Primitive {
                                             MemoryArena &arena,
                                             TransportMode mode,
                                             bool allowMultipleLobes) const = 0;
+    virtual char PrimType() const = 0;
 };
 
 // GeometricPrimitive Declarations
@@ -79,6 +80,8 @@ class GeometricPrimitive : public Primitive {
     void ComputeScatteringFunctions(SurfaceInteraction *isect,
                                     MemoryArena &arena, TransportMode mode,
                                     bool allowMultipleLobes) const;
+    char PrimType() const { return 0; }
+    std::shared_ptr<Shape> GetShape() { return shape; };
 
   private:
     // GeometricPrimitive Private Data
@@ -108,6 +111,7 @@ class TransformedPrimitive : public Primitive {
     Bounds3f WorldBound() const {
         return PrimitiveToWorld.MotionBounds(primitive->WorldBound());
     }
+    char PrimType() const { return 1; }
 
   private:
     // TransformedPrimitive Private Data
@@ -124,6 +128,7 @@ class Aggregate : public Primitive {
     void ComputeScatteringFunctions(SurfaceInteraction *isect,
                                     MemoryArena &arena, TransportMode mode,
                                     bool allowMultipleLobes) const;
+    char PrimType() const { return 2; }
 };
 
 }  // namespace pbrt

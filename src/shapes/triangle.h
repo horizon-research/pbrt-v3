@@ -93,6 +93,9 @@ class Triangle : public Shape {
     // reference point p.
     Float SolidAngle(const Point3f &p, int nSamples = 0) const;
 
+    char ShapeType() const { return 1; }
+    const Point3f GetVertexCoor(int i) { return mesh->p[v[i]]; }
+
   private:
     // Triangle Private Methods
     void GetUVs(Point2f uv[3]) const {

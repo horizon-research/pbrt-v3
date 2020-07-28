@@ -81,6 +81,7 @@ class Shape {
     // integration; the nSamples parameter determines how many samples are
     // used in this case.
     virtual Float SolidAngle(const Point3f &p, int nSamples = 512) const;
+    virtual char ShapeType() const { return 0; }
 
     // Shape Public Data
     const Transform *ObjectToWorld, *WorldToObject;

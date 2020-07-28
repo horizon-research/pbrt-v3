@@ -1653,6 +1653,7 @@ Scene *RenderOptions::MakeScene() {
         MakeAccelerator(AcceleratorName, std::move(primitives), AcceleratorParams);
     if (!accelerator) accelerator = std::make_shared<BVHAccel>(primitives);
     Scene *scene = new Scene(accelerator, lights);
+    scene->DumpPrimitives();
     // Erase primitives and lights from _RenderOptions_
     primitives.clear();
     lights.clear();

@@ -35,11 +35,49 @@
 #include "scene.h"
 #include "stats.h"
 
+#include "accelerators/bvh.h"
+#include "shapes/triangle.h"
+#include <typeinfo>
+
 namespace pbrt {
 
 STAT_COUNTER("Intersections/Regular ray intersection tests",
              nIntersectionTests);
 STAT_COUNTER("Intersections/Shadow ray intersection tests", nShadowTests);
+
+void Scene::DumpPrimitives() {
+    //https://stackoverflow.com/questions/1358143/downcasting-shared-ptrbase-to-shared-ptrderived
+    std::shared_ptr<BVHAccel> agg = std::static_pointer_cast<BVHAccel>(aggregate);
+
+    Bounds3f bounds = agg->WorldBound();
+    //printf("------\n(%f, %f, %f)\n", bounds[0][0], bounds[0][1], bounds[0][2]);
+    //printf("(%f, %f, %f)\n------\n", bounds[1][0], bounds[1][1], bounds[1][2]);
+
+    Vector3f dir(0, 0, 1);
+    //Vector3f invDir(1.f / dir.x, 1.f / dir.y, 1.f / dir.z);
+    //int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
+
+    std::vector<std::shared_ptr<Primitive>>& primitives = *(agg->Primitives());
+    //printf("primitive type: %s\n", typeid(*primitives[0]).name());
+    for (int i = 0; i < primitives.size(); i++) {
+      if (primitives[i]->PrimType() == 0) { // is GeometricPrimitive
+        std::shared_ptr<GeometricPrimitive> gp = std::static_pointer_cast<GeometricPrimitive>(primitives[i]);
+        if (gp->GetShape()->ShapeType() == 1) { // is Triangle
+          std::shared_ptr<Triangle> tr = std::static_pointer_cast<Triangle>(gp->GetShape());
+          printf("%f, %f, %f\n", tr->GetVertexCoor(0)[0], tr->GetVertexCoor(0)[1], tr->GetVertexCoor(0)[2]);
+          //printf("%f, %f, %f\n", tr->GetVertexCoor(1)[0], tr->GetVertexCoor(1)[1], tr->GetVertexCoor(1)[2]);
+          //printf("%f, %f, %f\n", tr->GetVertexCoor(2)[0], tr->GetVertexCoor(2)[1], tr->GetVertexCoor(2)[2]);
+          Ray ray(tr->GetVertexCoor(0), dir);
+          //bounds.IntersectP(ray, invDir, dirIsNeg);
+          float h0, h1;
+          if (bounds.IntersectP(ray, &h0, &h1)) {
+            float h = (h0 == 0) ? h1 : h0;
+            printf("%f, %f, %f\n", ray(h)[0], ray(h)[1], ray(h)[2]);
+          }
+        }
+      }
+    }
+}
 
 // Scene Method Definitions
 bool Scene::Intersect(const Ray &ray, SurfaceInteraction *isect) const {

@@ -759,4 +759,8 @@ std::shared_ptr<BVHAccel> CreateBVHAccelerator(
     return std::make_shared<BVHAccel>(std::move(prims), maxPrimsInNode, splitMethod);
 }
 
+std::vector<std::shared_ptr<Primitive>>* BVHAccel::Primitives() {
+  return &primitives;
+}
+
 }  // namespace pbrt

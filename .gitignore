@@ -1,4 +1,6 @@
 *~
+build
+build_debug
 src/build
 src/bin
 src/objs
